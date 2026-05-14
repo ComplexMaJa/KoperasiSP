@@ -1,0 +1,76 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        amoled: {
+          950: '#000000',
+          900: '#0a0a0a',
+          800: '#111111',
+          700: '#1a1a1a',
+          600: '#222222',
+          500: '#2a2a2a',
+        },
+        merah: {
+          950: '#3d0000',
+          900: '#5c0000',
+          800: '#7f0000',
+          700: '#a80000',
+          600: '#cc0000',
+          500: '#e60000',
+          400: '#ff1a1a',
+          300: '#ff4d4d',
+          200: '#ff8080',
+          100: '#ffe0e0',
+        },
+        teks: {
+          primary:   '#ffffff',
+          secondary: '#a3a3a3',
+          muted:     '#525252',
+          disabled:  '#3a3a3a',
+        },
+        sukses:     { DEFAULT: '#22c55e', bg: '#052e16' },
+        peringatan: { DEFAULT: '#f59e0b', bg: '#1c1400' },
+        bahaya:     { DEFAULT: '#e60000', bg: '#3d0000' },
+        info:       { DEFAULT: '#38bdf8', bg: '#0c1a2e' },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+      },
+      borderRadius: {
+        sm:    '6px',
+        DEFAULT:'8px',
+        md:    '10px',
+        lg:    '12px',
+        xl:    '16px',
+        '2xl': '20px',
+      },
+      boxShadow: {
+        'merah-sm': '0 0 0 1px #e60000',
+        'merah':    '0 0 0 2px #e60000',
+        'merah-lg': '0 0 20px rgba(230,0,0,0.25)',
+        'card':     '0 1px 3px rgba(0,0,0,0.8)',
+        'modal':    '0 25px 50px rgba(0,0,0,0.9)',
+        'sidebar':  '2px 0 8px rgba(0,0,0,0.6)',
+      },
+      animation: {
+        'fade-in':     'fadeIn 0.15s ease-out',
+        'slide-up':    'slideUp 0.2s ease-out',
+        'slide-in':    'slideIn 0.2s ease-out',
+        'pulse-merah': 'pulseMerah 2s cubic-bezier(0.4,0,0.6,1) infinite',
+        'spin-slow':   'spin 1.5s linear infinite',
+      },
+      keyframes: {
+        fadeIn:     { from: { opacity: '0' },                                     to: { opacity: '1' } },
+        slideUp:    { from: { transform: 'translateY(8px)', opacity: '0' },       to: { transform: 'translateY(0)', opacity: '1' } },
+        slideIn:    { from: { transform: 'translateX(-8px)', opacity: '0' },      to: { transform: 'translateX(0)', opacity: '1' } },
+        pulseMerah: { '0%,100%': { opacity: '1' }, '50%': { opacity: '0.4' } },
+      },
+      transitionDuration: { DEFAULT: '150ms' },
+    },
+  },
+  plugins: [],
+}
