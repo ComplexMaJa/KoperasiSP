@@ -32,7 +32,7 @@ RETURNS TABLE (
 DECLARE
     v_bunga_persen DECIMAL(5, 2);
 BEGIN
-    SELECT bunga_persen INTO v_bunga_persen FROM public.kategori_pinjaman WHERE id = p_kategori_id;
+    SELECT kp.bunga_persen INTO v_bunga_persen FROM public.kategori_pinjaman kp WHERE kp.id = p_kategori_id;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Kategori pinjaman tidak ditemukan.';
     END IF;
