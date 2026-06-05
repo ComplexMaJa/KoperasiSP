@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,9 +26,9 @@ interface Paginated<T> {
 
 // Schema
 const userSchema = z.object({
-  name: z.string().min(1, 'Nama wajib diisi.'),
-  email: z.string().email('Email tidak valid.').min(1, 'Email wajib diisi.'),
-  password: z.string().optional(),
+  name: z.string().min(1, 'Nama wajib diisi.').max(100, 'Nama maksimal 100 karakter.'),
+  email: z.string().email('Email tidak valid.').min(1, 'Email wajib diisi.').max(150, 'Email maksimal 150 karakter.'),
+  password: z.string().max(50, 'Password maksimal 50 karakter.').optional(),
   role: z.enum(['admin', 'pengurus']),
 })
 
@@ -40,6 +40,10 @@ export default function UserPage() {
   
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, roleFilter])
 
   // -- API Hooks --
   const { data: res, isLoading } = useQuery({
@@ -214,6 +218,31 @@ export default function UserPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {!isLoading && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-amoled-600 text-sm">
+            <div className="text-teks-secondary">
+              Menampilkan halaman <span className="text-white font-medium">{page}</span> dari <span className="text-white font-medium">{users?.last_page || 1}</span> (Total <span className="text-white font-medium">{users?.total || 0}</span> pengguna)
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, users?.last_page || 1))}
+                disabled={page === (users?.last_page || 1)}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -228,17 +257,17 @@ export default function UserPage() {
               <div className="modal-body">
                 <div>
                   <label className="label">Nama Lengkap</label>
-                  <input type="text" className="input" {...register('name')} />
+                  <input type="text" className="input" maxLength={100} {...register('name')} />
                   {errors.name && <p className="error-msg">{errors.name.message as string}</p>}
                 </div>
                 <div>
                   <label className="label">Email</label>
-                  <input type="email" className="input" {...register('email')} />
+                  <input type="email" className="input" maxLength={150} {...register('email')} />
                   {errors.email && <p className="error-msg">{errors.email.message as string}</p>}
                 </div>
                 <div>
                   <label className="label">Kata Sandi {editingUser && '(Opsional)'}</label>
-                  <input type="password" placeholder={editingUser ? 'Kosongkan jika tidak ingin diubah' : ''} className="input" {...register('password')} />
+                  <input type="password" placeholder={editingUser ? 'Kosongkan jika tidak ingin diubah' : ''} className="input" maxLength={50} {...register('password')} />
                   {errors.password && <p className="error-msg">{errors.password.message as string}</p>}
                 </div>
                 <div>

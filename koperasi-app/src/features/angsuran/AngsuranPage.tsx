@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { Search, Calculator, CheckCircle, Clock } from 'lucide-react'
@@ -13,6 +13,10 @@ export default function AngsuranPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, statusFilter])
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['angsuran', { page, search, status: statusFilter }],
@@ -163,6 +167,31 @@ export default function AngsuranPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {!isLoading && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-amoled-600 text-sm">
+            <div className="text-teks-secondary">
+              Menampilkan halaman <span className="text-white font-medium">{page}</span> dari <span className="text-white font-medium">{res?.data?.data?.last_page || 1}</span> (Total <span className="text-white font-medium">{res?.data?.data?.total || 0}</span> angsuran)
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, res?.data?.data?.last_page || 1))}
+                disabled={page === (res?.data?.data?.last_page || 1)}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

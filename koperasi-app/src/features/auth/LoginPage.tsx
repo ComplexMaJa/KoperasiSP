@@ -11,8 +11,8 @@ import { useAuthStore } from '@/store/authStore'
 import type { AuthUser } from '@/store/authStore'
 
 const schema = z.object({
-  email:    z.string().email('Format email tidak valid.').min(1, 'Email wajib diisi.'),
-  password: z.string().min(1, 'Kata sandi wajib diisi.'),
+  email:    z.string().email('Format email tidak valid.').min(1, 'Email wajib diisi.').max(150, 'Email maksimal 150 karakter.'),
+  password: z.string().min(1, 'Kata sandi wajib diisi.').max(50, 'Kata sandi maksimal 50 karakter.'),
 })
 type FormData = z.infer<typeof schema>
 
@@ -55,7 +55,7 @@ export default function LoginPage() {
         <div className="card-elevated p-6">
           <form onSubmit={handleSubmit((d) => login(d))} noValidate>
             <div className="space-y-4">
-              {/* Email */}
+               {/* Email */}
               <div>
                 <label className="label" htmlFor="email">Email</label>
                 <input
@@ -64,6 +64,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   placeholder="admin@koperasi.id"
                   className={errors.email ? 'input-error' : 'input'}
+                  maxLength={150}
                   {...register('email')}
                 />
                 {errors.email && <p className="error-msg">{errors.email.message}</p>}
@@ -79,6 +80,7 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     placeholder="••••••••"
                     className={`${errors.password ? 'input-error' : 'input'} pr-10`}
+                    maxLength={50}
                     {...register('password')}
                   />
                   <button

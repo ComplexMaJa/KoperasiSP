@@ -12,9 +12,9 @@ const formSchema = z.object({
   anggota_id: z.coerce.number().min(1, 'Anggota peminjam wajib dipilih'),
   penjamin_anggota_id: z.coerce.number().optional().nullable(),
   kategori_id: z.coerce.number().min(1, 'Kategori pinjaman wajib dipilih'),
-  jumlah_pinjaman: z.coerce.number().min(1000, 'Minimal pinjaman Rp 1.000'),
+  jumlah_pinjaman: z.coerce.number().min(1000, 'Minimal pinjaman Rp 1.000').max(1000000000, 'Maksimal pinjaman Rp 1.000.000.000'),
   tenor_bulan: z.coerce.number().min(1, 'Tenor minimal 1 bulan').max(60, 'Maksimal 60 bulan'),
-  tujuan_pinjaman: z.string().min(1, 'Tujuan pinjaman wajib diisi'),
+  tujuan_pinjaman: z.string().min(1, 'Tujuan pinjaman wajib diisi').max(255, 'Tujuan pinjaman maksimal 255 karakter'),
   tanggal_pengajuan: z.string().min(1, 'Tanggal pengajuan wajib diisi'),
 }).superRefine((data, ctx) => {
   if (data.penjamin_anggota_id && data.penjamin_anggota_id === data.anggota_id) {
@@ -31,6 +31,10 @@ export default function PinjamanPage() {
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  useEffect(() => {
+    setPage(1)
+  }, [statusFilter])
 
   // Queries
   const { data: res, isLoading } = useQuery({
@@ -166,6 +170,31 @@ export default function PinjamanPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {!isLoading && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-amoled-600 text-sm">
+            <div className="text-teks-secondary">
+              Menampilkan halaman <span className="text-white font-medium">{page}</span> dari <span className="text-white font-medium">{res?.data?.data?.last_page || 1}</span> (Total <span className="text-white font-medium">{res?.data?.data?.total || 0}</span> pengajuan)
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, res?.data?.data?.last_page || 1))}
+                disabled={page === (res?.data?.data?.last_page || 1)}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (
@@ -209,20 +238,20 @@ export default function PinjamanPage() {
                   <label className="label">Plafon Pinjaman</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-teks-muted">Rp</span>
-                    <input type="number" className="input pl-9 font-mono" {...register('jumlah_pinjaman')} />
+                    <input type="number" className="input pl-9 font-mono" max={1000000000} min={1000} {...register('jumlah_pinjaman')} />
                   </div>
                   {errors.jumlah_pinjaman && <p className="error-msg">{errors.jumlah_pinjaman.message as string}</p>}
                 </div>
 
                 <div>
                   <label className="label">Tenor (Bulan)</label>
-                  <input type="number" className="input" {...register('tenor_bulan')} />
+                  <input type="number" className="input" max={60} min={1} {...register('tenor_bulan')} />
                   {errors.tenor_bulan && <p className="error-msg">{errors.tenor_bulan.message as string}</p>}
                 </div>
 
                 <div className="md:col-span-2">
                   <label className="label">Tujuan Pinjaman</label>
-                  <input type="text" className="input" {...register('tujuan_pinjaman')} />
+                  <input type="text" className="input" maxLength={255} {...register('tujuan_pinjaman')} />
                   {errors.tujuan_pinjaman && <p className="error-msg">{errors.tujuan_pinjaman.message as string}</p>}
                 </div>
 

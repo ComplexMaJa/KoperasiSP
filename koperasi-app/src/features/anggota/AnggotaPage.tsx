@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -31,14 +31,14 @@ interface Refund {
 // Schemas
 const formSchema = z.object({
   nik: z.string().length(16, 'NIK harus 16 digit'),
-  nama: z.string().min(1, 'Nama wajib diisi'),
-  alamat: z.string().min(1, 'Alamat wajib diisi'),
-  telepon: z.string().min(1, 'Telepon wajib diisi'),
+  nama: z.string().min(1, 'Nama wajib diisi').max(150, 'Nama maksimal 150 karakter'),
+  alamat: z.string().min(1, 'Alamat wajib diisi').max(500, 'Alamat maksimal 500 karakter'),
+  telepon: z.string().min(1, 'Telepon wajib diisi').max(15, 'Telepon maksimal 15 karakter'),
   tanggal_gabung: z.string().min(1, 'Tanggal gabung wajib diisi'),
 })
 
 const keluarSchema = z.object({
-  keterangan_keluar: z.string().min(1, 'Alasan keluar wajib diisi'),
+  keterangan_keluar: z.string().min(1, 'Alasan keluar wajib diisi').max(255, 'Alasan keluar maksimal 255 karakter'),
 })
 
 export default function AnggotaPage() {
@@ -49,6 +49,10 @@ export default function AnggotaPage() {
   
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingData, setEditingData] = useState<Anggota | null>(null)
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, statusFilter])
   
   const [isKeluarOpen, setIsKeluarOpen] = useState(false)
   const [keluarTarget, setKeluarTarget] = useState<Anggota | null>(null)
@@ -238,6 +242,31 @@ export default function AnggotaPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {!isLoading && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-amoled-600 text-sm">
+            <div className="text-teks-secondary">
+              Menampilkan halaman <span className="text-white font-medium">{page}</span> dari <span className="text-white font-medium">{res?.data?.data?.last_page || 1}</span> (Total <span className="text-white font-medium">{res?.data?.data?.total || 0}</span> anggota)
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, res?.data?.data?.last_page || 1))}
+                disabled={page === (res?.data?.data?.last_page || 1)}
+                className="btn-ghost py-1.5 px-3"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Form Modal */}
@@ -268,17 +297,17 @@ export default function AnggotaPage() {
                   </div>
                   <div className="col-span-2">
                     <label className="label">Nama Lengkap</label>
-                    <input type="text" className="input" {...register('nama')} />
+                    <input type="text" className="input" maxLength={150} {...register('nama')} />
                     {errors.nama && <p className="error-msg">{errors.nama.message as string}</p>}
                   </div>
                   <div className="col-span-2">
                     <label className="label">Telepon</label>
-                    <input type="text" className="input" {...register('telepon')} />
+                    <input type="text" className="input" maxLength={15} {...register('telepon')} />
                     {errors.telepon && <p className="error-msg">{errors.telepon.message as string}</p>}
                   </div>
                   <div className="col-span-2">
                     <label className="label">Alamat</label>
-                    <textarea className="input" rows={3} {...register('alamat')}></textarea>
+                    <textarea className="input" rows={3} maxLength={500} {...register('alamat')}></textarea>
                     {errors.alamat && <p className="error-msg">{errors.alamat.message as string}</p>}
                   </div>
                 </div>
@@ -342,7 +371,7 @@ export default function AnggotaPage() {
 
               <form id="keluarForm" onSubmit={handleKeluar((d) => prosesKeluar(d))}>
                 <label className="label">Alasan / Keterangan Keluar</label>
-                <textarea className="input" rows={3} {...regKeluar('keterangan_keluar')} placeholder="Contoh: Pindah domisili..."></textarea>
+                 <textarea className="input" rows={3} maxLength={255} {...regKeluar('keterangan_keluar')} placeholder="Contoh: Pindah domisili..."></textarea>
                 {keluarErrors.keterangan_keluar && <p className="error-msg">{keluarErrors.keterangan_keluar.message as string}</p>}
               </form>
             </div>

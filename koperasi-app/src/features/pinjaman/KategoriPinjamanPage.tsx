@@ -8,9 +8,9 @@ import { Plus, Edit2, Trash2 } from 'lucide-react'
 import apiClient from '@/api/client'
 
 const formSchema = z.object({
-  nama_kategori: z.string().min(3, 'Nama kategori minimal 3 karakter'),
+  nama_kategori: z.string().min(3, 'Nama kategori minimal 3 karakter').max(100, 'Nama kategori maksimal 100 karakter'),
   bunga_persen: z.coerce.number().min(0, 'Bunga minimal 0%').max(100, 'Bunga maksimal 100%'),
-  keterangan: z.string().optional().nullable(),
+  keterangan: z.string().max(255, 'Keterangan maksimal 255 karakter').optional().nullable(),
 })
 
 export default function KategoriPinjamanPage() {
@@ -142,19 +142,19 @@ export default function KategoriPinjamanPage() {
                 
                 <div>
                   <label className="label">Nama Kategori</label>
-                  <input type="text" className="input" {...register('nama_kategori')} />
+                  <input type="text" className="input" maxLength={100} {...register('nama_kategori')} />
                   {errors.nama_kategori && <p className="error-msg">{errors.nama_kategori.message as string}</p>}
                 </div>
 
                 <div>
                   <label className="label">Bunga (% per bulan)</label>
-                  <input type="number" step="0.1" className="input font-mono" {...register('bunga_persen')} />
+                  <input type="number" step="0.1" className="input font-mono" max={100} min={0} {...register('bunga_persen')} />
                   {errors.bunga_persen && <p className="error-msg">{errors.bunga_persen.message as string}</p>}
                 </div>
 
                 <div>
                   <label className="label">Keterangan (Opsional)</label>
-                  <textarea className="input" rows={3} {...register('keterangan')} />
+                  <textarea className="input" rows={3} maxLength={255} {...register('keterangan')} />
                   {errors.keterangan && <p className="error-msg">{errors.keterangan.message as string}</p>}
                 </div>
 

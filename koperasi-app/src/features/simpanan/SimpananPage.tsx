@@ -17,8 +17,8 @@ interface Anggota {
 
 const sukarelaSchema = z.object({
   jenis: z.enum(['setor', 'tarik']).optional(),
-  jumlah: z.coerce.number().min(1000, 'Minimal Rp 1.000'),
-  keterangan: z.string().optional(),
+  jumlah: z.coerce.number().min(1000, 'Minimal Rp 1.000').max(1000000000, 'Maksimal Rp 1.000.000.000'),
+  keterangan: z.string().max(255, 'Keterangan maksimal 255 karakter').optional(),
   tanggal: z.string().min(1, 'Tanggal wajib diisi'),
 })
 
@@ -271,13 +271,13 @@ export default function SimpananPage() {
                   <label className="label">Nominal {sukarelaMode === 'setor' ? 'Setoran' : 'Penarikan'}</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-teks-muted">Rp</span>
-                    <input type="number" className="input pl-9 font-mono" {...register('jumlah')} placeholder="50000" />
+                    <input type="number" className="input pl-9 font-mono" max={1000000000} min={1000} {...register('jumlah')} placeholder="50000" />
                   </div>
                   {errors.jumlah && <p className="error-msg">{errors.jumlah.message as string}</p>}
                 </div>
                 <div>
                   <label className="label">Keterangan (Opsional)</label>
-                  <input type="text" className="input" {...register('keterangan')} placeholder="Contoh: Tabungan qurban" />
+                  <input type="text" className="input" maxLength={255} {...register('keterangan')} placeholder="Contoh: Tabungan qurban" />
                 </div>
               </div>
               <div className="modal-footer">
