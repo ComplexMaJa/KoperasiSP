@@ -14,8 +14,15 @@ const handleException = (err: any) => {
 export const apiClient = {
   get: async (url: string, config?: any): Promise<any> => {
     try {
-      const urlParts = url.split('/').filter(Boolean)
-      const params = config?.params || {}
+      const [pathOnly, queryString] = url.split('?')
+      const urlParts = pathOnly.split('/').filter(Boolean)
+      const params = { ...(config?.params || {}) }
+      if (queryString) {
+        const urlParams = new URLSearchParams(queryString)
+        for (const [key, value] of urlParams.entries()) {
+          params[key] = value
+        }
+      }
 
       // 1. GET /anggota
       if (urlParts[0] === 'anggota') {
@@ -517,7 +524,8 @@ export const apiClient = {
 
   post: async (url: string, data?: any, config?: any): Promise<any> => {
     try {
-      const urlParts = url.split('/').filter(Boolean)
+      const pathOnly = url.split('?')[0]
+      const urlParts = pathOnly.split('/').filter(Boolean)
 
       // 1. POST /auth/login
       if (urlParts[0] === 'auth' && urlParts[1] === 'login') {
@@ -736,7 +744,8 @@ export const apiClient = {
 
   put: async (url: string, data?: any, config?: any): Promise<any> => {
     try {
-      const urlParts = url.split('/').filter(Boolean)
+      const pathOnly = url.split('?')[0]
+      const urlParts = pathOnly.split('/').filter(Boolean)
 
       // 1. PUT /anggota/:id
       if (urlParts[0] === 'anggota' && urlParts[1]) {
@@ -845,7 +854,8 @@ export const apiClient = {
 
   delete: async (url: string, config?: any): Promise<any> => {
     try {
-      const urlParts = url.split('/').filter(Boolean)
+      const pathOnly = url.split('?')[0]
+      const urlParts = pathOnly.split('/').filter(Boolean)
 
       // 1. DELETE /anggota/:id
       if (urlParts[0] === 'anggota' && urlParts[1]) {
