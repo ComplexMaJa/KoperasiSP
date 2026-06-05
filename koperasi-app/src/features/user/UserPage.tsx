@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
-import { Plus, Edit2, Trash2, Power, PowerOff, Shield } from 'lucide-react'
+import { Plus, Edit2, Trash2, Power, PowerOff, Shield, Eye, EyeOff } from 'lucide-react'
 import apiClient from '@/api/client'
 
 // Types
@@ -40,6 +40,7 @@ export default function UserPage() {
   
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     setPage(1)
@@ -79,6 +80,7 @@ export default function UserPage() {
   const openAddModal = () => {
     setEditingUser(null)
     reset({ name: '', email: '', password: '', role: 'pengurus' })
+    setShowPassword(false)
     setIsModalOpen(true)
   }
 
@@ -90,6 +92,7 @@ export default function UserPage() {
       password: '', 
       role: (u.roles[0]?.name as any) || 'pengurus' 
     })
+    setShowPassword(false)
     setIsModalOpen(true)
   }
 
@@ -267,7 +270,22 @@ export default function UserPage() {
                 </div>
                 <div>
                   <label className="label">Kata Sandi {editingUser && '(Opsional)'}</label>
-                  <input type="password" placeholder={editingUser ? 'Kosongkan jika tidak ingin diubah' : ''} className="input" maxLength={50} {...register('password')} />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder={editingUser ? 'Kosongkan jika tidak ingin diubah' : ''}
+                      className="input pr-10"
+                      maxLength={50}
+                      {...register('password')}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 btn-icon p-1"
+                    >
+                      {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                  </div>
                   {errors.password && <p className="error-msg">{errors.password.message as string}</p>}
                 </div>
                 <div>
