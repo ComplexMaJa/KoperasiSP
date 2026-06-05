@@ -198,7 +198,7 @@ export const apiClient = {
         }
 
         // GET /angsuran list
-        let query = supabase.from('angsuran').select('*, pinjaman(*, anggota(nik, nama))', { count: 'exact' })
+        let query = supabase.from('angsuran').select('*, pinjaman(*, anggota:anggota_id(nik, nama))', { count: 'exact' })
         if (params.status) {
           query = query.eq('status', params.status)
         }
@@ -472,7 +472,7 @@ export const apiClient = {
         }
 
         if (urlParts[1] === 'angsuran') {
-          let query = supabase.from('angsuran').select('id, ke, tanggal_jatuh_tempo, tanggal_bayar, pokok, bunga, denda, status, pinjaman(anggota(nik, nama))')
+          let query = supabase.from('angsuran').select('id, ke, tanggal_jatuh_tempo, tanggal_bayar, pokok, bunga, denda, status, pinjaman(anggota:anggota_id(nik, nama))')
           if (params.start_date) {
             query = query.gte('tanggal_jatuh_tempo', params.start_date)
           }
@@ -491,7 +491,7 @@ export const apiClient = {
           
           const { data, error } = await supabase
             .from('angsuran')
-            .select('id, ke, tanggal_jatuh_tempo, tanggal_bayar, pokok, bunga, denda, status, pinjaman(anggota(nama, nik))')
+            .select('id, ke, tanggal_jatuh_tempo, tanggal_bayar, pokok, bunga, denda, status, pinjaman(anggota:anggota_id(nama, nik))')
             .gte('tanggal_jatuh_tempo', start)
             .lte('tanggal_jatuh_tempo', end)
             .order('tanggal_jatuh_tempo', { ascending: true })
