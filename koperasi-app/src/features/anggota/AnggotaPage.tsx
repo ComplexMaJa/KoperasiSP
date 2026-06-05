@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
-import { Plus, Edit2, LogOut, Search } from 'lucide-react'
+import { Plus, Edit2, LogOut, Search, Trash2 } from 'lucide-react'
 import apiClient from '@/api/client'
+import { useAuthStore } from '@/store/authStore'
 
 // Types
 interface Anggota {
@@ -80,7 +81,7 @@ export default function AnggotaPage() {
     },
     onError: (err: any) => {
       toast.error(err.message)
-      if (err.errors) toast.error(Object.values(err.errors)[0][0] as string)
+      if (err.errors) toast.error((Object.values(err.errors)[0] as any)?.[0] || 'Terjadi kesalahan')
     }
   })
 
@@ -89,6 +90,17 @@ export default function AnggotaPage() {
     onSuccess: (res) => {
       toast.success(res.data.pesan)
       setIsKeluarOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['anggota'] })
+    },
+    onError: (err: any) => toast.error(err.message)
+  })
+
+  const isAdmin = useAuthStore(s => s.isAdmin())
+
+  const { mutate: deleteAnggota } = useMutation({
+    mutationFn: (id: number) => apiClient.delete(`/anggota/${id}`),
+    onSuccess: (res) => {
+      toast.success(res.data.pesan)
       queryClient.invalidateQueries({ queryKey: ['anggota'] })
     },
     onError: (err: any) => toast.error(err.message)
@@ -204,6 +216,19 @@ export default function AnggotaPage() {
                           }}
                         >
                           <LogOut size={16} />
+                        </button>
+                      )}
+                      {isAdmin && (
+                        <button 
+                          className="btn-icon text-bahaya hover:text-white"
+                          title="Hapus Anggota"
+                          onClick={() => {
+                            if (confirm(`Apakah Anda yakin ingin menghapus anggota ${a.nama}? Seluruh riwayat simpanan, pinjaman, dan angsuran miliknya akan terhapus secara permanen.`)) {
+                              deleteAnggota(a.id)
+                            }
+                          }}
+                        >
+                          <Trash2 size={16} />
                         </button>
                       )}
                     </td>

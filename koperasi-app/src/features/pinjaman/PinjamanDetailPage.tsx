@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CheckCircle, XCircle, ArrowLeft, Zap } from 'lucide-react'
+import { CheckCircle, XCircle, ArrowLeft, Zap, Trash2 } from 'lucide-react'
 import apiClient from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 
@@ -55,6 +55,15 @@ export default function PinjamanDetailPage() {
     onSuccess: (res) => {
       toast.success(res.data.pesan)
       queryClient.invalidateQueries({ queryKey: ['pinjaman', id] })
+    },
+    onError: (err: any) => toast.error(err.message)
+  })
+
+  const { mutate: deletePinjaman } = useMutation({
+    mutationFn: () => apiClient.delete(`/pinjaman/${id}`),
+    onSuccess: (res) => {
+      toast.success(res.data.pesan)
+      navigate('/pinjaman')
     },
     onError: (err: any) => toast.error(err.message)
   })
@@ -175,6 +184,19 @@ export default function PinjamanDetailPage() {
                   <span className="text-bahaya font-bold block mb-1">Alasan Ditolak:</span>
                   <p className="text-bahaya">{p.catatan_penolakan}</p>
                </div>
+            )}
+
+            {isAdmin && (
+               <button 
+                 className="btn-danger w-full py-3 text-sm mt-3" 
+                 onClick={() => {
+                   if (confirm('Apakah Anda yakin ingin menghapus pinjaman ini secara permanen beserta semua jadwal angsurannya?')) {
+                     deletePinjaman()
+                   }
+                 }}
+               >
+                 <Trash2 size={18} /> Hapus Pinjaman
+               </button>
             )}
           </div>
         </div>
