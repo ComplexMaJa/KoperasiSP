@@ -179,7 +179,13 @@ export default function LaporanPage() {
                 <BarChart data={transChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
                   <XAxis dataKey="name" stroke="#666" fontSize={12} />
-                  <YAxis stroke="#666" fontSize={12} tickFormatter={(val) => `Rp ${val / 1000000}M`} />
+                  <YAxis stroke="#666" fontSize={12} tickFormatter={(val) => {
+                    if (val === 0) return 'Rp 0'
+                    if (val >= 1000000000) return `Rp ${(val / 1000000000).toLocaleString('id-ID')} M`
+                    if (val >= 1000000) return `Rp ${(val / 1000000).toLocaleString('id-ID')} Jt`
+                    if (val >= 1000) return `Rp ${(val / 1000).toLocaleString('id-ID')} Rb`
+                    return `Rp ${val.toLocaleString('id-ID')}`
+                  }} />
                   <Tooltip cursor={{ fill: '#2a2a2a' }} contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
                   <Legend />
                   <Bar dataKey="Pemasukan" fill="#10b981" radius={[4,4,0,0]} />
