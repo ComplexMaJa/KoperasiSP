@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="assets/banner.svg" alt="KoperasiSP" width="100%" />
-</p>
+<img width="2497" height="1247" alt="image" src="https://github.com/user-attachments/assets/8900b0b4-4eca-4798-84c8-3116dbef2c6c" />
+
 
 <h1 align="center">KoperasiSP</h1>
 
